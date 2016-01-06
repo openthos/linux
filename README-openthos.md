@@ -12,3 +12,6 @@
  - https://www.kernel.org/
  - http://www.android-x86.org/
  - https://github.com/maurossi/linux.git
+
+## Contact
+ - yuchen AT mail.tsinghua.edu.cn
