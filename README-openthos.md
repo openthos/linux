@@ -12,6 +12,7 @@
  - https://github.com/openthos/openthos/wiki
  - https://www.kernel.org/
  - http://www.android-x86.org/
+ - https://github.com/meijjaa/linux.git
  - https://github.com/maurossi/linux.git
 
 ## Contact
