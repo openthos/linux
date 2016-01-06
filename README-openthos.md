@@ -1,7 +1,7 @@
 # README-openthos
 
 ## Goal
- - Maintain customized linux kernel for openthos project.
+ - Maintain customized linux kernel for [openthos](https://github.com/openthos/openthos/wiki)project.
 
 ## Schedule
  - kernel-4.4+
@@ -9,6 +9,7 @@
  - Follow every Long-Term vallia linux kernel, and update them for openthos project  working correctly
  
 ## Related info
+ - https://github.com/openthos/openthos/wiki
  - https://www.kernel.org/
  - http://www.android-x86.org/
  - https://github.com/maurossi/linux.git
