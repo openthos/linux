@@ -1,7 +1,7 @@
 # README-openthos
 
 ## Goal
- - Maintain customized linux kernel for [openthos](https://github.com/openthos/openthos/wiki)project.
+ - Maintain customized linux kernel for [openthos](https://github.com/openthos/openthos/wiki) project.
 
 ## Introduction
  - based on linux kernel-4.4+
