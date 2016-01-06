@@ -3,9 +3,9 @@
 ## Goal
  - Maintain customized linux kernel for [openthos](https://github.com/openthos/openthos/wiki)project.
 
-## Schedule
- - kernel-4.4+
- - support skylake cpu currently
+## Introduction
+ - based on linux kernel-4.4+
+ - support skylake cpu(x86-64) currently
  - Follow every Long-Term vallia linux kernel, and update them for openthos project  working correctly
  
 ## Related info
