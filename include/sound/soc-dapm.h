@@ -49,6 +49,9 @@ struct device;
 #define SND_SOC_DAPM_SIGGEN(wname) \
 {	.id = snd_soc_dapm_siggen, .name = wname, .kcontrol_news = NULL, \
 	.num_kcontrols = 0, .reg = SND_SOC_NOPM }
+#define SND_SOC_DAPM_SINK(wname) \
+{	.id = snd_soc_dapm_sink, .name = wname, .kcontrol_news = NULL, \
+	.num_kcontrols = 0, .reg = SND_SOC_NOPM }
 #define SND_SOC_DAPM_INPUT(wname) \
 {	.id = snd_soc_dapm_input, .name = wname, .kcontrol_news = NULL, \
 	.num_kcontrols = 0, .reg = SND_SOC_NOPM }
@@ -97,6 +100,7 @@ struct device;
 {       .id = snd_soc_dapm_mixer_named_ctl, .name = wname, \
 	SND_SOC_DAPM_INIT_REG_VAL(wreg, wshift, winvert), \
 	.kcontrol_news = wcontrols, .num_kcontrols = wncontrols}
+/* DEPRECATED: use SND_SOC_DAPM_SUPPLY */
 #define SND_SOC_DAPM_MICBIAS(wname, wreg, wshift, winvert) \
 {	.id = snd_soc_dapm_micbias, .name = wname, \
 	SND_SOC_DAPM_INIT_REG_VAL(wreg, wshift, winvert), \
@@ -470,7 +474,7 @@ enum snd_soc_dapm_type {
 	snd_soc_dapm_out_drv,			/* output driver */
 	snd_soc_dapm_adc,			/* analog to digital converter */
 	snd_soc_dapm_dac,			/* digital to analog converter */
-	snd_soc_dapm_micbias,		/* microphone bias (power) */
+	snd_soc_dapm_micbias,		/* microphone bias (power) - DEPRECATED: use snd_soc_dapm_supply */
 	snd_soc_dapm_mic,			/* microphone */
 	snd_soc_dapm_hp,			/* headphones */
 	snd_soc_dapm_spk,			/* speaker */
@@ -485,6 +489,7 @@ enum snd_soc_dapm_type {
 	snd_soc_dapm_aif_in,		/* audio interface input */
 	snd_soc_dapm_aif_out,		/* audio interface output */
 	snd_soc_dapm_siggen,		/* signal generator */
+	snd_soc_dapm_sink,
 	snd_soc_dapm_dai_in,		/* link to DAI structure */
 	snd_soc_dapm_dai_out,
 	snd_soc_dapm_dai_link,		/* link between two DAI structures */

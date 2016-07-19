@@ -1,7 +1,7 @@
 /*
  *  Ralink RT288x SoC PCI register definitions
  *
- *  Copyright (C) 2009 John Crispin <blogic@openwrt.org>
+ *  Copyright (C) 2009 John Crispin <john@phrozen.org>
  *  Copyright (C) 2009 Gabor Juhos <juhosg@openwrt.org>
  *
  *  Parts of this file are based on Ralink's 2.6.21 BSP
@@ -221,7 +221,6 @@ int __init pcibios_map_irq(const struct pci_dev *dev, u8 slot, u8 pin)
 static int rt288x_pci_probe(struct platform_device *pdev)
 {
 	void __iomem *io_map_base;
-	int i;
 
 	rt2880_pci_base = ioremap_nocache(RT2880_PCI_BASE, PAGE_SIZE);
 

@@ -297,8 +297,6 @@ static bool rt5677_volatile_register(struct device *dev, unsigned int reg)
 	case RT5677_HAP_GENE_CTRL2:
 	case RT5677_PWR_DSP_ST:
 	case RT5677_PRIV_DATA:
-	case RT5677_PLL1_CTRL2:
-	case RT5677_PLL2_CTRL2:
 	case RT5677_ASRC_22:
 	case RT5677_ASRC_23:
 	case RT5677_VAD_CTRL5:
@@ -1243,59 +1241,45 @@ static int rt5677_dmic_use_asrc(struct snd_soc_dapm_widget *source,
 		regmap_read(rt5677->regmap, RT5677_ASRC_5, &asrc_setting);
 		asrc_setting = (asrc_setting & RT5677_AD_STO1_CLK_SEL_MASK) >>
 				RT5677_AD_STO1_CLK_SEL_SFT;
-		if (asrc_setting >= RT5677_CLK_SEL_I2S1_ASRC &&
-			asrc_setting <= RT5677_CLK_SEL_I2S6_ASRC)
-			return 1;
 		break;
 
 	case 10:
 		regmap_read(rt5677->regmap, RT5677_ASRC_5, &asrc_setting);
 		asrc_setting = (asrc_setting & RT5677_AD_STO2_CLK_SEL_MASK) >>
 				RT5677_AD_STO2_CLK_SEL_SFT;
-		if (asrc_setting >= RT5677_CLK_SEL_I2S1_ASRC &&
-			asrc_setting <= RT5677_CLK_SEL_I2S6_ASRC)
-			return 1;
 		break;
 
 	case 9:
 		regmap_read(rt5677->regmap, RT5677_ASRC_5, &asrc_setting);
 		asrc_setting = (asrc_setting & RT5677_AD_STO3_CLK_SEL_MASK) >>
 				RT5677_AD_STO3_CLK_SEL_SFT;
-		if (asrc_setting >= RT5677_CLK_SEL_I2S1_ASRC &&
-			asrc_setting <= RT5677_CLK_SEL_I2S6_ASRC)
-			return 1;
 		break;
 
 	case 8:
 		regmap_read(rt5677->regmap, RT5677_ASRC_5, &asrc_setting);
 		asrc_setting = (asrc_setting & RT5677_AD_STO4_CLK_SEL_MASK) >>
 			RT5677_AD_STO4_CLK_SEL_SFT;
-		if (asrc_setting >= RT5677_CLK_SEL_I2S1_ASRC &&
-			asrc_setting <= RT5677_CLK_SEL_I2S6_ASRC)
-			return 1;
 		break;
 
 	case 7:
 		regmap_read(rt5677->regmap, RT5677_ASRC_6, &asrc_setting);
 		asrc_setting = (asrc_setting & RT5677_AD_MONOL_CLK_SEL_MASK) >>
 			RT5677_AD_MONOL_CLK_SEL_SFT;
-		if (asrc_setting >= RT5677_CLK_SEL_I2S1_ASRC &&
-			asrc_setting <= RT5677_CLK_SEL_I2S6_ASRC)
-			return 1;
 		break;
 
 	case 6:
 		regmap_read(rt5677->regmap, RT5677_ASRC_6, &asrc_setting);
 		asrc_setting = (asrc_setting & RT5677_AD_MONOR_CLK_SEL_MASK) >>
 			RT5677_AD_MONOR_CLK_SEL_SFT;
-		if (asrc_setting >= RT5677_CLK_SEL_I2S1_ASRC &&
-			asrc_setting <= RT5677_CLK_SEL_I2S6_ASRC)
-			return 1;
 		break;
 
 	default:
-		break;
+		return 0;
 	}
+
+	if (asrc_setting >= RT5677_CLK_SEL_I2S1_ASRC &&
+	    asrc_setting <= RT5677_CLK_SEL_I2S6_ASRC)
+		return 1;
 
 	return 0;
 }
@@ -4522,14 +4506,9 @@ static int rt5677_set_bias_level(struct snd_soc_codec *codec,
 }
 
 #ifdef CONFIG_GPIOLIB
-static inline struct rt5677_priv *gpio_to_rt5677(struct gpio_chip *chip)
-{
-	return container_of(chip, struct rt5677_priv, gpio_chip);
-}
-
 static void rt5677_gpio_set(struct gpio_chip *chip, unsigned offset, int value)
 {
-	struct rt5677_priv *rt5677 = gpio_to_rt5677(chip);
+	struct rt5677_priv *rt5677 = gpiochip_get_data(chip);
 
 	switch (offset) {
 	case RT5677_GPIO1 ... RT5677_GPIO5:
@@ -4550,7 +4529,7 @@ static void rt5677_gpio_set(struct gpio_chip *chip, unsigned offset, int value)
 static int rt5677_gpio_direction_out(struct gpio_chip *chip,
 				     unsigned offset, int value)
 {
-	struct rt5677_priv *rt5677 = gpio_to_rt5677(chip);
+	struct rt5677_priv *rt5677 = gpiochip_get_data(chip);
 
 	switch (offset) {
 	case RT5677_GPIO1 ... RT5677_GPIO5:
@@ -4574,7 +4553,7 @@ static int rt5677_gpio_direction_out(struct gpio_chip *chip,
 
 static int rt5677_gpio_get(struct gpio_chip *chip, unsigned offset)
 {
-	struct rt5677_priv *rt5677 = gpio_to_rt5677(chip);
+	struct rt5677_priv *rt5677 = gpiochip_get_data(chip);
 	int value, ret;
 
 	ret = regmap_read(rt5677->regmap, RT5677_GPIO_ST, &value);
@@ -4586,7 +4565,7 @@ static int rt5677_gpio_get(struct gpio_chip *chip, unsigned offset)
 
 static int rt5677_gpio_direction_in(struct gpio_chip *chip, unsigned offset)
 {
-	struct rt5677_priv *rt5677 = gpio_to_rt5677(chip);
+	struct rt5677_priv *rt5677 = gpiochip_get_data(chip);
 
 	switch (offset) {
 	case RT5677_GPIO1 ... RT5677_GPIO5:
@@ -4640,7 +4619,7 @@ static void rt5677_gpio_config(struct rt5677_priv *rt5677, unsigned offset,
 
 static int rt5677_to_irq(struct gpio_chip *chip, unsigned offset)
 {
-	struct rt5677_priv *rt5677 = gpio_to_rt5677(chip);
+	struct rt5677_priv *rt5677 = gpiochip_get_data(chip);
 	struct regmap_irq_chip_data *data = rt5677->irq_data;
 	int irq;
 
@@ -4696,10 +4675,10 @@ static void rt5677_init_gpio(struct i2c_client *i2c)
 
 	rt5677->gpio_chip = rt5677_template_chip;
 	rt5677->gpio_chip.ngpio = RT5677_GPIO_NUM;
-	rt5677->gpio_chip.dev = &i2c->dev;
+	rt5677->gpio_chip.parent = &i2c->dev;
 	rt5677->gpio_chip.base = -1;
 
-	ret = gpiochip_add(&rt5677->gpio_chip);
+	ret = gpiochip_add_data(&rt5677->gpio_chip, rt5677);
 	if (ret != 0)
 		dev_err(&i2c->dev, "Failed to add GPIOs: %d\n", ret);
 }
@@ -4788,7 +4767,7 @@ static int rt5677_remove(struct snd_soc_codec *codec)
 
 	regmap_write(rt5677->regmap, RT5677_RESET, 0x10ec);
 	gpiod_set_value_cansleep(rt5677->pow_ldo2, 0);
-	gpiod_set_value_cansleep(rt5677->reset_pin, 0);
+	gpiod_set_value_cansleep(rt5677->reset_pin, 1);
 
 	return 0;
 }
@@ -4803,7 +4782,7 @@ static int rt5677_suspend(struct snd_soc_codec *codec)
 		regcache_mark_dirty(rt5677->regmap);
 
 		gpiod_set_value_cansleep(rt5677->pow_ldo2, 0);
-		gpiod_set_value_cansleep(rt5677->reset_pin, 0);
+		gpiod_set_value_cansleep(rt5677->reset_pin, 1);
 	}
 
 	return 0;
@@ -4814,8 +4793,11 @@ static int rt5677_resume(struct snd_soc_codec *codec)
 	struct rt5677_priv *rt5677 = snd_soc_codec_get_drvdata(codec);
 
 	if (!rt5677->dsp_vad_en) {
+		rt5677->pll_src = 0;
+		rt5677->pll_in = 0;
+		rt5677->pll_out = 0;
 		gpiod_set_value_cansleep(rt5677->pow_ldo2, 1);
-		gpiod_set_value_cansleep(rt5677->reset_pin, 1);
+		gpiod_set_value_cansleep(rt5677->reset_pin, 0);
 		if (rt5677->pow_ldo2 || rt5677->reset_pin)
 			msleep(10);
 
@@ -5160,7 +5142,7 @@ static int rt5677_i2c_probe(struct i2c_client *i2c,
 		return ret;
 	}
 	rt5677->reset_pin = devm_gpiod_get_optional(&i2c->dev,
-			"realtek,reset", GPIOD_OUT_HIGH);
+			"realtek,reset", GPIOD_OUT_LOW);
 	if (IS_ERR(rt5677->reset_pin)) {
 		ret = PTR_ERR(rt5677->reset_pin);
 		dev_err(&i2c->dev, "Failed to request RESET: %d\n", ret);

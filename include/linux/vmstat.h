@@ -163,12 +163,10 @@ static inline unsigned long zone_page_state_snapshot(struct zone *zone,
 #ifdef CONFIG_NUMA
 
 extern unsigned long node_page_state(int node, enum zone_stat_item item);
-extern void zone_statistics(struct zone *, struct zone *, gfp_t gfp);
 
 #else
 
 #define node_page_state(node, item) global_page_state(item)
-#define zone_statistics(_zl, _z, gfp) do { } while (0)
 
 #endif /* CONFIG_NUMA */
 
@@ -176,11 +174,11 @@ extern void zone_statistics(struct zone *, struct zone *, gfp_t gfp);
 #define sub_zone_page_state(__z, __i, __d) mod_zone_page_state(__z, __i, -(__d))
 
 #ifdef CONFIG_SMP
-void __mod_zone_page_state(struct zone *, enum zone_stat_item item, int);
+void __mod_zone_page_state(struct zone *, enum zone_stat_item item, long);
 void __inc_zone_page_state(struct page *, enum zone_stat_item);
 void __dec_zone_page_state(struct page *, enum zone_stat_item);
 
-void mod_zone_page_state(struct zone *, enum zone_stat_item, int);
+void mod_zone_page_state(struct zone *, enum zone_stat_item, long);
 void inc_zone_page_state(struct page *, enum zone_stat_item);
 void dec_zone_page_state(struct page *, enum zone_stat_item);
 
@@ -189,8 +187,13 @@ extern void __inc_zone_state(struct zone *, enum zone_stat_item);
 extern void dec_zone_state(struct zone *, enum zone_stat_item);
 extern void __dec_zone_state(struct zone *, enum zone_stat_item);
 
+void quiet_vmstat(void);
 void cpu_vm_stats_fold(int cpu);
 void refresh_zone_stat_thresholds(void);
+
+struct ctl_table;
+int vmstat_refresh(struct ctl_table *, int write,
+		   void __user *buffer, size_t *lenp, loff_t *ppos);
 
 void drain_zonestat(struct zone *zone, struct per_cpu_pageset *);
 
@@ -205,7 +208,7 @@ void set_pgdat_percpu_threshold(pg_data_t *pgdat,
  * The functions directly modify the zone and global counters.
  */
 static inline void __mod_zone_page_state(struct zone *zone,
-			enum zone_stat_item item, int delta)
+			enum zone_stat_item item, long delta)
 {
 	zone_page_state_add(delta, zone, item);
 }
@@ -249,6 +252,7 @@ static inline void __dec_zone_page_state(struct page *page,
 
 static inline void refresh_zone_stat_thresholds(void) { }
 static inline void cpu_vm_stats_fold(int cpu) { }
+static inline void quiet_vmstat(void) { }
 
 static inline void drain_zonestat(struct zone *zone,
 			struct per_cpu_pageset *pset) { }
